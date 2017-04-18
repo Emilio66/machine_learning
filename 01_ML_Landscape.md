@@ -42,7 +42,7 @@
 ### 12. What is the difference between a model parameter and a learning algorithm’s hyperparameter?
 > hyperparameters are initialized prior to the training and remain unchanged in the process, while model' parameters are adjusted along the training process to get optimal ones
 
->     So, to summarize. [Hyperparameters:](https://www.quora.com/Machine-Learning/What-are-hyperparameters-in-machine-learning)
+> So, to summarize. [Hyperparameters:](https://www.quora.com/Machine-Learning/What-are-hyperparameters-in-machine-learning)
 * Define higher level concepts about the model such as complexity, or capacity to learn.
 * Cannot be learned directly from the data in the standard model training process and need to be predefined.
 * Can be decided by setting different values, training different models, and choosing the values that test better
