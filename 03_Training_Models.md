@@ -16,8 +16,7 @@
 
 > It depends, if the cost function is convex and learning rate is right, all GD will converge at the global optimal solution. but as SGD & mini-batch are erratic, it means they'll jump back & forth around the optimal solution. Traing SGD for a long time doesn't guarantee it will get nearer to the target, they do not truly converge, so the model might be a little different.  
 
-### 5. Suppose you use Batch Gradient Descent and you plot the validation error at every epoch. If you notice that the validation
-error consistently goes up, what is likely going on? How can you fix this?
+### 5. Suppose you use Batch Gradient Descent and you plot the validation error at every epoch. If you notice that the validation error consistently goes up, what is likely going on? How can you fix this?
 
 > If validation error is high but training error is low, then it might because the model overfits the test set which results in low generalization capability. Solutions: feed more data; do cross-validation; regularization
 If both validation error & training error are high, then the possible case is that learning rate is too high which causes the model diverge, we should reduce learning rate.
@@ -34,9 +33,9 @@ If both validation error & training error are high, then the possible case is th
 
 > overfitting - if the validation error is much higher than training error; 1. feed more data, 2. regularize, 3. decrease degree
 ---
-### 9. Suppose you are using Ridge Regression and you notice that the training error and the validation error are almost equal and fairly high. Would you say that the model suffers from high bias or high variance? Should you increase the regularization hyperparameter α or reduce it?
+### 9. Suppose you are using Ridge Regression and you notice that the training error and the validation error are almost *equal and fairly high*. Would you say that the model suffers from high bias or high variance? Should you increase the regularization hyperparameter α or reduce it?
 
-> underfitting(when training error is high): reduce hyperparameter to eliminate bias
+> underfitting(when training error is high & equal to vlidation error roughly): reduce hyperparameter to eliminate bias
 
 ### 10. Why would you want to use:
 Ridge Regression instead of Linear Regression?
@@ -44,10 +43,11 @@ Lasso instead of Ridge Regression?
 Elastic Net instead of Lasso?
 
 > 
-*Ridge, by default; (a model with regularizatin usually perform better than those don't, prefer Ridge than plain linear regression
-*Lasso when assuming there're less important features; (use L1 penalty which tends to push the insignificatn weights down to 0)
-*Elastic Net: #feature > #instance or features are mutally correlated (where Lasso behave erratically) 
 
+* Ridge, by default; (a model with regularizatin usually perform better than those don't, prefer Ridge than plain linear regression
+* Lasso when assuming there're less important features; (use L1 penalty which tends to push the insignificatn weights down to 0)
+* Elastic Net: #feature > #instance or features are mutally correlated (where Lasso behave erratically) 
+---
 ### 11. Suppose you want to classify pictures as outdoor/indoor and daytime/nighttime. Should you implement two Logistic Regression classifiers or one Softmax Regression classifier?
 
 > use 2 logistic regression classifiers since Softmax Regression focus on 1 class of data at 1 time while the problem has two type of class.
