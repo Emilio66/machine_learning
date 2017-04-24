@@ -30,14 +30,11 @@ If both validation error & training error are high, then the possible case is th
 
 > mini-batch GD is the fastest GD, Batch GD will actually converge. Do proper learning schedule, use early stopping when necessary.
 
-## 8. Suppose you are using Polynomial Regression. You plot the learning curves and you notice that there is a large gap between the
-training error and the validation error. What is happening? What are three ways to solve this?
+## 8. Suppose you are using Polynomial Regression. You plot the learning curves and you notice that there is a large gap between the training error and the validation error. What is happening? What are three ways to solve this?
 
 > overfitting - if the validation error is much higher than training error; 1. feed more data, 2. regularize, 3. decrease degree
-
-### 9. Suppose you are using Ridge Regression and you notice that the training error and the validation error are almost equal and fairly
-high. Would you say that the model suffers from high bias or high variance? Should you increase the regularization hyperparameter α
-or reduce it?
+---
+### 9. Suppose you are using Ridge Regression and you notice that the training error and the validation error are almost equal and fairly high. Would you say that the model suffers from high bias or high variance? Should you increase the regularization hyperparameter α or reduce it?
 
 > underfitting(when training error is high): reduce hyperparameter to eliminate bias
 
@@ -51,9 +48,8 @@ Elastic Net instead of Lasso?
 *Lasso when assuming there're less important features; (use L1 penalty which tends to push the insignificatn weights down to 0)
 *Elastic Net: #feature > #instance or features are mutally correlated (where Lasso behave erratically) 
 
-### 11. Suppose you want to classify pictures as outdoor/indoor and daytime/nighttime. Should you implement two Logistic Regression
-classifiers or one Softmax Regression classifier?
+### 11. Suppose you want to classify pictures as outdoor/indoor and daytime/nighttime. Should you implement two Logistic Regression classifiers or one Softmax Regression classifier?
 
-> 2 logistic regression classifiers since Softmax Regression focus on 1 class of data at 1 time while the problem has two type of class.
+> use 2 logistic regression classifiers since Softmax Regression focus on 1 class of data at 1 time while the problem has two type of class.
 
 ### 12. Implement Batch Gradient Descent with early stopping for Softmax Regression (without using Scikit-Learn).
