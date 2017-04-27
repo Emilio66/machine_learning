@@ -92,7 +92,7 @@ def basic_dynamic_rnn():
     X_batch = np.array([
         # t = 0      t = 1 
         [[0, 1, 2], [9, 8, 7]], # instance 1
-        [[3, 4, 5], [0, 0, 0]], # instance 2
+        [[3, 4, 5], [8, 3, 2]], # instance 2
         [[6, 7, 8], [6, 5, 4]], # instance 3
         [[9, 0, 1], [3, 2, 1]], # instance 4
     ])
@@ -103,3 +103,33 @@ def basic_dynamic_rnn():
         print(np.transpose(outputs_val, axes=[1, 0, 2])[1])
 
 basic_dynamic_rnn()
+
+def variable_input_rnn():
+    tf.reset_default_graph()
+    n_steps = 2
+    n_inputs = 3
+    n_neurons = 5
+
+    seq_length = tf.placeholder(tf.int32,[None])
+    X = tf.placeholder(tf.float32, [None, n_steps, n_inputs])
+    basic_cell = tf.contrib.rnn.BasicRNNCell(num_units=n_neurons)
+    # use off-the-shelf Neuron Network construction function, save the trouble of stack/unstack
+    outputs, states = tf.nn.dynamic_rnn(basic_cell, X,sequence_length=seq_length, dtype=tf.float32)
+
+    init = tf.global_variables_initializer()
+    X_batch = np.array([
+        # t = 0      t = 1 
+        [[0, 1, 2], [9, 8, 7]], # instance 1
+        [[3, 4, 5], [0, 0, 0]], # instance 2 (padded with zero vectors)
+        [[6, 7, 8], [6, 5, 4]], # instance 3
+        [[9, 0, 1], [0, 0, 0]], # instance 4 (padded with zero vectors)
+    ])
+    batch_seq_length = np.array([2,1,2,1])
+    with tf.Session() as sess:
+        init.run()
+        outputs_val = outputs.eval(feed_dict={X: X_batch, seq_length:batch_seq_length})
+        print(outputs_val)
+        print(np.transpose(outputs_val, axes=[1, 0, 2])[1])
+
+variable_input_rnn()
+
