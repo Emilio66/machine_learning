@@ -8,6 +8,7 @@ n_inputs = 28
 n_neurons = 150
 n_outputs = 10
 learning_rate = 0.01
+n_layers = 3 # add multiple layers to the network
 
 # input 3 dimension: 1: instance, 2: row pixels, 3: column pixels
 X = tf.placeholder(tf.float32, [None, n_steps, n_inputs])
@@ -16,10 +17,15 @@ y = tf.placeholder(tf.int32, [None])
 with tf.variable_scope("rnn", initializer=tf.contrib.layers.variance_scaling_initializer()):
     # a cell means 1 layer with n_neurons neurons, here, 150
     basic_cell = tf.contrib.rnn.BasicRNNCell(num_units=n_neurons, activation=tf.nn.relu)
-    outputs, states = tf.nn.dynamic_rnn(basic_cell, X, dtype=tf.float32)
+    multi_cells = tf.contrib.rnn.MultiRNNCell([basic_cell]*n_layers,state_is_tuple=False)
+    outputs, states = tf.nn.dynamic_rnn(multi_cells, X, dtype=tf.float32)
 
+print("Shape of Outputs: ",outputs.shape, "shape of states: ", states)
 # in a fully-connected manner
+# this can be done by setting state_is_tuple as False
+#states = tf.concat(axis=1, values=states)
 classifier= fully_connected(states, n_outputs, activation_fn=None)
+print("Shape of classifier: ",classifier.shape)
 # softmax + cross entropy calculation
 xentropy = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=y, logits=classifier)
 # define loss function & optimize method
