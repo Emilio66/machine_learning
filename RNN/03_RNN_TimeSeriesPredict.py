@@ -94,10 +94,17 @@ y = tf.placeholder(tf.float32, [None, n_steps, n_output])
 #outputs, states = tf.nn.dynamic_rnn(wrapped_cell, X, dtype=tf.float32)
 # without using OutputProjectionWrapper
 #basic_cell = tf.contrib.rnn.BasicRNNCell(num_units=n_neurons, activation=tf.nn.relu)
-basic_cell = tf.contrib.rnn.BasicLSTMCell(num_units=n_neurons, activation=tf.nn.relu)
+lstm_cell = tf.contrib.rnn.BasicLSTMCell(num_units=n_neurons, activation=tf.nn.relu)
 # 3 layers' lstm
-multi_cell = tf.contrib.rnn.MultiRNNCell([lstm_cell]*3)
-rnn_outputs, states = tf.nn.dynamic_rnn(multi_cell, X, dtype=tf.float32)
+#multi_cell = tf.contrib.rnn.MultiRNNCell([lstm_cell]*3)
+#multi_cell = tf.contrib.rnn.MultiRNNCell([lstm_cell]*2)
+#rnn_outputs, states = tf.nn.dynamic_rnn(multi_cell, X, dtype=tf.float32)
+# Add Dropout
+keep_prob = 0.75
+is_training = True
+if is_training:
+    lstm_cell = tf.contrib.rnn.DropoutWrapper(lstm_cell, input_keep_prob=keep_prob)
+rnn_outputs, states = tf.nn.dynamic_rnn(lstm_cell, X, dtype=tf.float32)
 stacked_rnn_outputs = tf.reshape(rnn_outputs, [-1, n_neurons])
 stacked_outputs = fully_connected(stacked_rnn_outputs, n_output, activation_fn=None)
 outputs = tf.reshape(stacked_outputs, [-1, n_steps, n_output])
