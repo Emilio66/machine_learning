@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
+from tensorflow.contrib.layers import fully_connected
 
 t_min, t_max = 0, 30
 step = 0.1
@@ -77,11 +78,16 @@ y = tf.placeholder(tf.float32, [None, n_steps, n_output])
 #cell = tf.contrib.rnn.BasicRNNCell(num_units=n_neurons, activation=tf.nn.relu)
 #cell =tf.contrib.rnn.BasicRNNCell(num_units=n_neurons, actication=tf.rnn.relu)
 #wrapped_cell = tf.contrib.rnn.OutputProjectionWrapper(cell, ouput_size=n_output)
-wrapped_cell = tf.contrib.rnn.OutputProjectionWrapper(
-    tf.contrib.rnn.BasicRNNCell(num_units=n_neurons, activation=tf.nn.relu),
-        output_size=n_output)
-outputs, states = tf.nn.dynamic_rnn(wrapped_cell, X, dtype=tf.float32)
-
+#wrapped_cell = tf.contrib.rnn.OutputProjectionWrapper(
+#    tf.contrib.rnn.BasicRNNCell(num_units=n_neurons, activation=tf.nn.relu),
+#        output_size=n_output)
+#outputs, states = tf.nn.dynamic_rnn(wrapped_cell, X, dtype=tf.float32)
+# without using OutputProjectionWrapper
+basic_cell = tf.contrib.rnn.BasicRNNCell(num_units=n_neurons, activation=tf.nn.relu)
+rnn_outputs, states = tf.nn.dynamic_rnn(basic_cell, X, dtype=tf.float32)
+stacked_rnn_outputs = tf.reshape(rnn_outputs, [-1, n_neurons])
+stacked_outputs = fully_connected(stacked_rnn_outputs, n_output, activation_fn=None)
+outputs = tf.reshape(stacked_outputs, [-1, n_steps, n_output])
 # define loss optimizer
 loss = tf.reduce_sum(tf.square(outputs-y))
 optimizer = tf.train.AdamOptimizer(learning_rate)
