@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
+import time
 from tensorflow.contrib.layers import fully_connected
 
 t_min, t_max = 0, 30
@@ -13,6 +14,15 @@ def time_series(t):
 x_series = np.linspace(t_min, t_max, (t_max - t_min)//step)
 n_steps = 20
 t_instance = np.linspace(10.,10.+(n_steps+1)*step, n_steps+1)
+
+start_time = time.time()
+def elapsed(sec):
+    if sec<60:
+        return str(sec) + " sec"
+    elif sec<(60*60):
+        return str(sec/60) + " min"
+    else:
+        return str(sec/(60*60)) + " hr"
 '''
 # plot figure
 plt.figure(figsize=(11,4))
@@ -55,17 +65,17 @@ def next_batch(batch_size, n_steps):
    # print(ys)
     # return training batch & target batch
     return ys[:,:-1].reshape(-1, n_steps, 1), ys[:,1:].reshape(-1, n_steps, 1)
-train, target = next_batch(4, 2) 
-print("=== Next batch of 4,2")
-print(train.shape, train)
-print(target.shape, target)
-print(np.c_[train[0], target[0]])
+#train, target = next_batch(4, 2) 
+#print("=== Next batch of 4,2")
+#print(train.shape, train)
+#print(target.shape, target)
+#print(np.c_[train[0], target[0]])
 
 #########################
 ### contruction phase ###
 #########################
 tf.reset_default_graph()
-n_neurons = 100
+n_neurons = 250 
 n_steps = 20
 n_input = 1
 n_output = 1
@@ -83,8 +93,11 @@ y = tf.placeholder(tf.float32, [None, n_steps, n_output])
 #        output_size=n_output)
 #outputs, states = tf.nn.dynamic_rnn(wrapped_cell, X, dtype=tf.float32)
 # without using OutputProjectionWrapper
-basic_cell = tf.contrib.rnn.BasicRNNCell(num_units=n_neurons, activation=tf.nn.relu)
-rnn_outputs, states = tf.nn.dynamic_rnn(basic_cell, X, dtype=tf.float32)
+#basic_cell = tf.contrib.rnn.BasicRNNCell(num_units=n_neurons, activation=tf.nn.relu)
+basic_cell = tf.contrib.rnn.BasicLSTMCell(num_units=n_neurons, activation=tf.nn.relu)
+# 3 layers' lstm
+multi_cell = tf.contrib.rnn.MultiRNNCell([lstm_cell]*3)
+rnn_outputs, states = tf.nn.dynamic_rnn(multi_cell, X, dtype=tf.float32)
 stacked_rnn_outputs = tf.reshape(rnn_outputs, [-1, n_neurons])
 stacked_outputs = fully_connected(stacked_rnn_outputs, n_output, activation_fn=None)
 outputs = tf.reshape(stacked_outputs, [-1, n_steps, n_output])
@@ -96,7 +109,7 @@ training_op = optimizer.minimize(loss)
 ##############################
 ##### Training Phase #########
 ##############################
-n_iterations = 1000
+n_iterations = 2500
 batch_size = 50
 
 init = tf.global_variables_initializer()
@@ -107,17 +120,17 @@ with tf.Session() as sess:
         sess.run(training_op, feed_dict={X: X_batch, y: y_batch})
         if iter % 100 == 0:
             mse = loss.eval(feed_dict={X: X_batch, y: y_batch})
-            print(iter, "MSE: ", mse)
+            print(iter,elapsed(time.time()-start_time), "MSE: ", mse)
     # evaluate
     X_new = time_series(np.array(t_instance[:-1].reshape(-1, n_steps, n_input)))
     y_pred = sess.run(outputs, feed_dict={X: X_new})
-    print(y_pred)
-    y_target = time_series(np.array(t_instance[1:].reshape(-1, n_steps, n_input)))
-    print(y_target)
+    #print(y_pred)
+    #y_target = time_series(np.array(t_instance[1:].reshape(-1, n_steps, n_input)))
+    #print(y_target)
 
 plt.title("Testing the model", fontsize=14)
 plt.plot(t_instance[:-1], time_series(t_instance[:-1]), "bo", markersize=10, label="instance")
-plt.plot(t_instance[1:], time_series(t_instance[1:]), "g*", markersize=10, label="target")
+plt.plot(t_instance[1:], time_series(t_instance[1:]), "y*", markersize=10, label="target")
 plt.plot(t_instance[1:], y_pred[0,:,0], "r.", markersize=10, label="prediction")
 plt.legend(loc="upper left")
 plt.xlabel("Time")
