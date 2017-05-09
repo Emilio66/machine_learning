@@ -79,7 +79,7 @@ n_neurons = 250
 n_steps = 20
 n_input = 1
 n_output = 1
-learning_rate = 0.001
+learning_rate = 0.001#0.0005 # # 0.02 # 0.005
 
 X = tf.placeholder(tf.float32, [None, n_steps, n_input])
 y = tf.placeholder(tf.float32, [None, n_steps, n_output])
@@ -101,7 +101,7 @@ lstm_cell = tf.contrib.rnn.BasicLSTMCell(num_units=n_neurons, activation=tf.nn.r
 #rnn_outputs, states = tf.nn.dynamic_rnn(multi_cell, X, dtype=tf.float32)
 # Add Dropout
 keep_prob = 0.75
-is_training = True
+is_training = False 
 if is_training:
     lstm_cell = tf.contrib.rnn.DropoutWrapper(lstm_cell, input_keep_prob=keep_prob)
 rnn_outputs, states = tf.nn.dynamic_rnn(lstm_cell, X, dtype=tf.float32)
