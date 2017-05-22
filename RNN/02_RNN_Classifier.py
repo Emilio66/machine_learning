@@ -20,12 +20,12 @@ with tf.variable_scope("rnn", initializer=tf.contrib.layers.variance_scaling_ini
     multi_cells = tf.contrib.rnn.MultiRNNCell([basic_cell]*n_layers,state_is_tuple=False)
     outputs, states = tf.nn.dynamic_rnn(multi_cells, X, dtype=tf.float32)
 
-print("Shape of Outputs: ",outputs.shape, "shape of states: ", states)
+print("Shape of Outputs: ",outputs.shape, "shape of states: ", states.shape)
 # in a fully-connected manner
 # this can be done by setting state_is_tuple as False
 #states = tf.concat(axis=1, values=states)
 classifier= fully_connected(states, n_outputs, activation_fn=None)
-print("Shape of classifier: ",classifier.shape)
+print("Shape of classifier: ",classifier.shape, "Shape of y: ", y.shape)
 # softmax + cross entropy calculation
 xentropy = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=y, logits=classifier)
 # define loss function & optimize method
@@ -44,7 +44,8 @@ epoch_number = 10
 batch_size = 150
 X_test= mnist.test.images.reshape((-1, n_steps, n_inputs))
 y_test = mnist.test.labels
-
+print("Y_TEST: TYPE: ", type(y_test)," shape: ", y_test.shape)
+print("X_TEST: TYPE: ", type(X_test)," shape: ", X_test.shape)
 # run the model
 with tf.Session() as sess:
     init.run()
@@ -54,11 +55,13 @@ with tf.Session() as sess:
             X_batch, y_batch = mnist.train.next_batch(batch_size)
             # reshape the data to fit the format of input
             X_batch = X_batch.reshape((-1, n_steps, n_inputs))
-            sess.run(training_op, feed_dict={X: X_batch, y: y_batch})
-            acc_train = accuracy.eval(feed_dict={X: X_batch, y: y_batch})
+            # print("Y_batch: TYPE: ", type(y_batch)," shape: ", y_batch.shape)
+            
+            acc_train,_=sess.run([accuracy,training_op], feed_dict={X: X_batch, y: y_batch})
+            accuracy_test=sess.run(accuracy,feed_dict={X: X_test,y: y_test})
             acc_test = accuracy.eval(feed_dict={X: X_test,y: y_test})
         print(epoch, "Train accuracy:", acc_train, "Test accuracy:", acc_test)
+        print(accuracy_test)
     save_path = saver.save(sess,"./my_model_final.ckpt")
 
-
-
+ 
